@@ -1,0 +1,34 @@
+name: Deploy to Timeweb
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy via FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy files to Timeweb hosting
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: 92.53.96.169
+          username: cb313664
+          password: @85kx!N#Lsp6
+          port: 21
+          protocol: ftp
+          local-dir: ./
+          server-dir: /domains/cb313664.tw1.ru/public_html/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/node_modules/**
+            **/.env
+            **/README.md
