@@ -20,7 +20,7 @@ jobs:
         with:
           server: 92.53.96.169
           username: cb313664
-          password: @85kx!N#Lsp6
+          password: '@85kx!N#Lsp6'
           port: 21
           protocol: ftp
           local-dir: ./
