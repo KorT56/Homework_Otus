@@ -24,7 +24,7 @@ jobs:
           port: 21
           protocol: ftp
           local-dir: ./
-          server-dir: /domains/cb313664.tw1.ru/public_html/
+          server-dir: cb313664.tw1.ru/public_html/
           exclude: |
             **/.git*
             **/.git*/**
