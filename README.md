@@ -1,5 +1,5 @@
 Адрес приложения. 
-[https://cb313664.tw1.ru/local/homeworks/homework_3/index_8.php](https://cb313664.tw1.ru/local/homeworks/homework_3/index_9.php)
+https://cb313664.tw1.ru/local/homeworks/homework_3/index_9.php
 
 Можно перейти в левом меню, выбрав пункт "Список врачей/Связывание моделей"
 Откроется в новой вкладке.
