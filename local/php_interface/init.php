@@ -26,3 +26,11 @@ function CloseAccessForUnauthorized()
         die;
     }
 }
+
+// Регистрируем наш кастомный "модуль" через autoload
+Bitrix\Main\Loader::registerAutoLoadClasses(
+    null,
+    [
+        'Custom\\Uslugi\\ServiceTable' => '/local/modules/custom.uslugi/lib/ServiceTable.php',
+    ]
+);
