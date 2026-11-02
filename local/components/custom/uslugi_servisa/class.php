@@ -79,6 +79,13 @@ class UslugiServisaComponent extends CBitrixComponent implements Controllerable 
         $rows = []; // массив строк
         $items = $this->getServices(); // получаем уникальные услуги
 
+        // Заранее получаем символьный код типа инфоблока для запчастей (чтобы ссылка в админку работала)
+        $iblockType = '';
+        $rsIblock = \CIBlock::GetList([], ['ID' => (int)$this->arParams['PARTS_IBLOCK_ID']]);
+        if ($arIblock = $rsIblock->Fetch()) {
+            $iblockType = $arIblock['IBLOCK_TYPE_ID'];
+        }
+
         foreach ($items as $item) { // перебираем услуги
             // Отдельно запрашиваем запчасти именно для этой услуги
             $partsIds = [];
@@ -94,13 +101,16 @@ class UslugiServisaComponent extends CBitrixComponent implements Controllerable 
                 }
             }
 
-            $partsData = $this->getPartsNames($partsIds); // получаем данные запчастей
+           $partsData = $this->getPartsNames($partsIds); // получаем данные запчастей
             $partsHtml = ''; // HTML для ячейки
             if ($partsData) { // если есть запчасти
                 $partsHtml = '<ul class="uslugi-parts">'; // открываем список
                 foreach ($partsData as $part) { // перебираем данные
-                    // Формируем строку: Ссылка на товар (Цена руб., Остаток: X шт.)
-                    $partsHtml .= '<li><a href="/bitrix/admin/iblock_element_edit.php?IBLOCK_ID='.$this->arParams['PARTS_IBLOCK_ID'].'&type=catalog&ID='.$part['ID'].'" target="_blank">' 
+                    // Формируем ссылку напрямую в карточку товара в CRM
+                    // 14 - это ID инфоблока, который хранится в $this->arParams['PARTS_IBLOCK_ID']
+                    $crmLink = '/crm/catalog/' . (int)$this->arParams['PARTS_IBLOCK_ID'] . '/product/' . $part['ID'] . '/';
+                    
+                    $partsHtml .= '<li><a href="'.$crmLink.'" target="_blank">' 
                                 . htmlspecialcharsbx($part['NAME']) . '</a>' 
                                 . ' — <b>' . $part['PRICE'] . ' руб.</b>' 
                                 . ' (Остаток: ' . $part['STOCK'] . ' шт.)</li>'; 
