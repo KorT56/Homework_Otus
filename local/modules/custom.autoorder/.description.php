@@ -1,9 +1,10 @@
-php
 <?php
-$arClass = [
-    'ID' => 'custom.autoorder',
-    'NAME' => 'Автозаказ по минимальному остатку',
-    'DESCRIPTION' => 'Модуль для формирования черновиков заказов на основе остатков',
-    'PARTNER_NAME' => 'custom',
+if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) die();
+$arComponentDescription = [
+    "NAME" => "Грид Автозаказа",
+    "DESCRIPTION" => "Выводит данные из таблицы custom_autoorder_drafts",
+    "PATH" => [
+        "ID" => "custom",
+        "NAME" => "Кастомные компоненты",
+    ],
 ];
-?>

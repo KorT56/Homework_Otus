@@ -1,36 +1,29 @@
-<?
+<?php
+// Защита от неавторизованных
 AddEventHandler("main", "OnProlog", "CloseAccessForUnauthorized");
-
-function CloseAccessForUnauthorized()
-{
+function CloseAccessForUnauthorized() {
     global $USER, $APPLICATION;
-
-    // если мы в административном разделе — ничего не делаем
-    if (defined('ADMIN_SECTION') && ADMIN_SECTION === true) {
-        return;
-    }
-
-    // если пользователь не авторизован и не на странице авторизации
+    if (defined('ADMIN_SECTION') && ADMIN_SECTION === true) return;
     if (!$USER->IsAuthorized() && !in_array($APPLICATION->GetCurPage(), array("/auth/"))) {
-        // создаём объект Uri для страницы авторизации
         $uri = new \Bitrix\Main\Web\Uri("/auth/");
-        // добавляем параметр back_url с текущей страницей
-        $uri->addParams([
-            "back_url" => $APPLICATION->GetCurPage()
-        ]);
-        // получаем готовую строку URL
-        $redirectUrl = $uri->getUri();
-
-        // перенаправляем на страницу входа
-        LocalRedirect($redirectUrl);
+        $uri->addParams(["back_url" => $APPLICATION->GetCurPage()]);
+        LocalRedirect($uri->getUri());
         die;
     }
 }
 
-// Регистрируем наш кастомный "модуль" через autoload
+// Автозагрузка для uslugi
 Bitrix\Main\Loader::registerAutoLoadClasses(
     null,
-    [
-        'Custom\\Uslugi\\ServiceTable' => '/local/modules/custom.uslugi/lib/ServiceTable.php',
-    ]
+    ['Custom\\Uslugi\\ServiceTable' => '/local/modules/custom.uslugi/lib/ServiceTable.php']
 );
+
+use Bitrix\Main\Loader;
+
+// Подключаем модули
+if (Loader::includeModule('custom.autoorder')) {
+    // Модуль настроек
+}
+if (Loader::includeModule('custom.dealtabs')) {
+    // Модуль вкладки в CRM
+}
