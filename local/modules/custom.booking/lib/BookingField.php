@@ -6,17 +6,24 @@ use Bitrix\Main\Localization\Loc;
 // подключаем языковые файлы
 Loc::loadMessages(__FILE__);
 
+// класс кастомного свойства
 class BookingField
 {
     // описание типа свойства для битрикса
     public static function GetUserTypeDescription()
     {
         return array(
+            // базовый тип - привязка к элементу
             "PROPERTY_TYPE"        => "E", 
+            // уникальный код типа
             "USER_TYPE"            => "CUSTOM_BOOKING_LINK", 
+            // название в админке
             "DESCRIPTION"          => "Кастомная ссылка для записи",
+            // метод вывода на сайте
             "GetPublicViewHTML"    => array(__CLASS__, "GetPublicViewHTML"),
+            // метод вывода в списке админки
             "GetAdminListViewHTML" => array(__CLASS__, "GetAdminListViewHTML"),
+            // метод вывода в форме редактирования
             "GetPropertyFieldHtml" => array(__CLASS__, "GetPropertyFieldHtml"),
         );
     }
@@ -35,14 +42,16 @@ class BookingField
             // инициализируем ядро попапов, ajax и календаря
             \CJSCore::Init(['popup', 'ajax', 'date']);
 
-            // получаем название процедуры
+            // дефолтное название
             $elementName = "Процедура #" . $elementId;
+            // получаем элемент инфоблока
             $rsElement = \CIBlockElement::GetList(
                 array(), 
                 array("ID" => $elementId, "ACTIVE" => "Y"), 
                 false, false, 
                 array("NAME")
             );
+            // если нашли - берем название
             if ($arElement = $rsElement->Fetch()) {
                 $elementName = htmlspecialcharsbx($arElement["NAME"]);
             }
@@ -50,28 +59,39 @@ class BookingField
             // id инфоблока откуда кликнули
             $sourceIblockId = (int)$arProperty['IBLOCK_ID'];
 
-            // НАСТРОЙКИ МАРШРУТИЗАЦИИ (настраиваем один раз в коде)
+            // настройки для списка врачи
             if ($sourceIblockId == 16) {
-                // если кликнули из Врачей
+                // целевой инфоблок
                 $targetIblockId = 26; 
+                // поле фио
                 $propFio = "FIO_KLIENTA";
+                // поле даты
                 $propDate = "VREMYA_ZAPISI_KLIENTA";
+                // поле процедуры
                 $propProc = "PROTSEDURY_DLYA_KLIENTA";
+            // настройки для списка мастера (услуги)
             } else if ($sourceIblockId == 29) {
-                // если кликнули из Мастеров (замените 29 на реальный ID, если он другой)
+                // целевой инфоблок
                 $targetIblockId = 27; 
-                $propFio = ""; // В 27-м инфоблоке ФИО пишется в NAME
+                // поле фио (пишется в название)
+                $propFio = ""; 
+                // поле даты
                 $propDate = "VREMYA_ZAPISI_KLIENTA";
+                // поле процедуры
                 $propProc = "USLUGI_SERVISA";
+            // дефолтные настройки для новых списков
             } else {
-                // дефолтные настройки для новых списков (если появятся)
+                // целевой инфоблок
                 $targetIblockId = 27; 
+                // поле фио
                 $propFio = "";
+                // поле даты
                 $propDate = "VREMYA_ZAPISI_KLIENTA";
+                // поле процедуры
                 $propProc = "USLUGI_SERVISA";
             }
 
-            // возвращаем кнопку со всеми data-атрибутами
+            // возвращаем кнопку с данными
             return '<span class="custom-booking-link ui-btn ui-btn-sm ui-btn-success" 
                 style="cursor:pointer; margin: 2px 5px 2px 0; display:inline-block;" 
                 data-procedure-id="' . $elementId . '" 
@@ -87,13 +107,16 @@ class BookingField
     // вывод в списке админки
     public static function GetAdminListViewHTML($arProperty, $value, $strHTMLControlName)
     {
+        // используем тот же метод
         return self::GetPublicViewHTML($arProperty, $value, $strHTMLControlName);
     }
 
     // вывод в форме редактирования
     public static function GetPropertyFieldHtml($arProperty, $value, $strHTMLControlName)
     {
+        // переменная для опций
         $options = '';
+        // получаем элементы привязанного инфоблока
         $rsElements = \CIBlockElement::GetList(
             array("SORT" => "ASC"), 
             array("IBLOCK_ID" => $arProperty["LINK_IBLOCK_ID"]), 
@@ -101,11 +124,15 @@ class BookingField
             array("ID", "NAME")
         );
         
+        // формируем опции
         while ($arElement = $rsElements->Fetch()) {
+            // проверяем выбран ли элемент
             $sel = ((int)$value['VALUE'] === (int)$arElement['ID']) ? 'selected' : '';
+            // добавляем опцию
             $options .= '<option value="' . $arElement['ID'] . '" ' . $sel . '>' . htmlspecialcharsbx($arElement['NAME']) . '</option>';
         }
 
+        // возвращаем выпадающий список
         return '<select name="' . $strHTMLControlName["VALUE"] . '" style="max-width:300px;">'
             . '<option value="">-- Выберите услугу --</option>'
             . $options
