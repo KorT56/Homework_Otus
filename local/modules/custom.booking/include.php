@@ -9,3 +9,9 @@ Loader::registerAutoLoadClasses(
 );
 
 AddEventHandler('iblock', 'OnIBlockPropertyBuildList', ['\Custom\Booking\BookingField', 'GetUserTypeDescription']);
+
+\CJSCore::RegisterExt('custom.booking', [
+    'js' => '/bitrix/js/custom.booking/script.js', 
+    'rel' => ['popup', 'ajax', 'date'], 
+]);
+?>
