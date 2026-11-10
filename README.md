@@ -1,4 +1,7 @@
-ТЗ-2 логирование
+ТЗ-2. Логирование
+
+Адрес:
+https://cb313664.tw1.ru/local/homeworks/homework_2/index.php?clear_cache=Y
 
 Описание для пользователя
 
