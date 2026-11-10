@@ -1,33 +1,19 @@
-<? require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php");
-$APPLICATION->SetTitle("Ошибка для exeption");
+<?php
+// подключаем шапку
+require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php");
 
-use Bitrix\Main\Diag\Debug;
+// грузим класс обработчика
+\Bitrix\Main\Loader::registerAutoLoadClasses(null, [
+    'Otus\\Debug\\ExceptionHandler' => '/local/App/Debug/ExceptionHandler.php',
+]);
 
-// Ловим ошибку и пишем в лог
-try {
-    // Искусственно создаем ошибку
-    throw new Exception("Это тестовое исключение для домашнего задания.");
-} catch (Exception $e) {
-    // Записываем данные об ошибке в файл
-    Debug::writeToFile(
-        'Текст ошибки', // Заголовок записи
-        [
-            'message' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine()
-        ], 
-        '/local/logs/exceptions.log' // Путь к файлу лога
-    );
-}
+// вызываем метод очистки
+\Otus\Debug\ExceptionHandler::clear();
+
+// выводим сообщение об успехе
+echo '<h3 style="color: green;">Лог ошибок успешно очищен.</h3>';
+echo '<p>Можно закрыть эту вкладку и вернуться на главную страницу.</p>';
+
+// завершаем работу скрипта
+die;
 ?>
-<ul class="list-group">
-    <li class="list-group-item">
-        <a href="/local/logs/exceptions.log" target="_blank">Файл лога</a>
-    </li>
-</ul>
-<?
-// ошибка для exeption (уже обработана выше)
-
-?>
-
-<? require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/footer.php"); ?>

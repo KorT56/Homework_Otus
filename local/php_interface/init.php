@@ -1,13 +1,15 @@
 <?php
 
-//  Защита от неавторизованных
+// защита от неавторизованных
 AddEventHandler("main", "OnProlog", "CloseAccessForUnauthorized");
 function CloseAccessForUnauthorized()
 {
     global $USER, $APPLICATION;
+    // пропускаем админку
     if (defined('ADMIN_SECTION') && ADMIN_SECTION === true) {
         return;
     }
+    // редирект на авторизацию
     if (!$USER->IsAuthorized() && !in_array($APPLICATION->GetCurPage(), array("/auth/"))) {
         $uri = new \Bitrix\Main\Web\Uri("/auth/");
         $uri->addParams(["back_url" => $APPLICATION->GetCurPage()]);
@@ -16,28 +18,37 @@ function CloseAccessForUnauthorized()
     }
 }
 
-// Автозагрузка для uslugi
+// подключаю обработчик ошибок
+$exceptionHandlerPath = $_SERVER['DOCUMENT_ROOT'] . '/local/App/Debug/ExceptionHandler.php';
+// проверяем наличие файла
+if (file_exists($exceptionHandlerPath)) {
+    // грузим файл
+    require_once $exceptionHandlerPath;
+}
+
+// автозагрузка для uslugi
 Bitrix\Main\Loader::registerAutoLoadClasses(
     null,
     ['Custom\\Uslugi\\ServiceTable' => '/local/modules/custom.uslugi/lib/ServiceTable.php']
 );
 
-// Подключение модулей
+// подключение модулей
 use Bitrix\Main\Loader;
 
+// модуль авто-заказа
 if (Loader::includeModule('custom.autoorder')) {
-    // Модуль настроек автозаказа
+    // настройки автозаказа
 }
 
+// модуль вкладки CRM
 if (Loader::includeModule('custom.dealtabs')) {
-    // Модуль вкладки в CRM
+    // вкладка в CRM
 }
 
-// Подключаем модуль custom.booking, чтобы сработал обработчик свойства
+// модуль записи
 if (Loader::includeModule('custom.booking')) {
-    // Модуль записи подключен, тип свойства зарегистрирован
+    // модуль подключен
     
-    // Инициализируем наше JS-расширение 
-    // Это автоматически подтянет скрипт 
+    // грузим JS
     \CJSCore::Init(['custom.booking']);
 }

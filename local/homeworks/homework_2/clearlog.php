@@ -1,16 +1,19 @@
 <?php
+// подключаем шапку
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php");
 
-// Путь к файлу лога (замени на свой, если он лежит в другой папке)
-$logFile = $_SERVER["DOCUMENT_ROOT"] . "/local/homeworks/homework_2/custom.log";
+// грузим класс логгера
+\Bitrix\Main\Loader::registerAutoLoadClasses(null, [
+    'Otus\\Debug\\Log' => '/local/App/Debug/Log.php',
+]);
 
-// Проверяем, существует ли файл, и удаляем его
-if (file_exists($logFile)) {
-    unlink($logFile); 
-}
+// вызываем метод очистки
+\Otus\Debug\Log::clear();
 
-// Перенаправляем пользователя обратно на страницу с домашками
-LocalRedirect('/local/homeworks/homework_2/');
+// выводим сообщение об успехе
+echo '<h3 style="color: green;">Лог успешно очищен!</h3>';
+echo '<p>Можете закрыть эту вкладку и вернуться на главную страницу.</p>';
 
-require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/footer.php");
+// завершаем работу скрипта
+die;
 ?>

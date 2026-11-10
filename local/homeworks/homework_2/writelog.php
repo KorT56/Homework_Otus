@@ -1,21 +1,27 @@
-<? require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php");
+<? 
+// подключаем шапку
+require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php"); 
+?>
+<?php
+// задаем заголовок
 $APPLICATION->SetTitle("Добавление в лог");
 
-// Подключаем классы
-use App\Debug\Log;
+//  класс
+\Bitrix\Main\Loader::registerAutoLoadClasses(null, [
+    'Otus\\Debug\\Log' => '/local/App/Debug/Log.php',
+]);
 
-// ВАЖНО: нужно указать полный путь к файлу лога на сервере
-$logPath = $_SERVER["DOCUMENT_ROOT"] . "/local/homeworks/homework_2/custom.log";
-$logger = new Log($logPath);
-
-// Пишем сообщение
-$logger->info('Открыта страница writelog.php');
-
+// пишем в лог (дату и OTUS класс добавит сам)
+\Otus\Debug\Log::write('Тестовая ошибка writelog.php');
 ?>
+    <!-- выводим список -->
     <ul class="list-group">
         <li class="list-group-item">
-            <a href="/local/homeworks/homework_2/custom.log" target="_blank">Файл лога</a>,
-            в лог добавлена запись 'Открыта страница writelog.php'
+            <!-- ссылка на лог -->
+            <a href="/local/logs/log_custom.log">Файл лога</a>,
+            <!-- текст сообщения -->
+            в лог добавлена запись 'Тестовая ошибка writelog.php'
         </li>
     </ul>
+<!-- подключаем подвал -->
 <? require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/footer.php"); ?>
