@@ -1,8 +1,8 @@
 <?
-// подключаем шапку битрикса чтобы страница была в общем шаблоне портала
+
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php");
 
-// задаём заголовок страницы который увидит пользователь в браузере и в хлебных крошках
+
 $APPLICATION->SetTitle("Автомобили");
 
 // подключаем нужные классы битрикса через use чтобы не писать длинные пути каждый раз
@@ -15,7 +15,7 @@ use Bitrix\Main\ORM\Fields\Relations\Reference;
 use Bitrix\Main\ORM\Query\Join;
 use Bitrix\Iblock\ElementTable;
 
-// проверяем что модуль инфоблоков установлен, иначе дальше работать нет смысла
+// проверяем что модуль инфоблоков установлен
 if (!Loader::includeModule('iblock')) {
     echo 'Модуль iblock не подключён';
     return;

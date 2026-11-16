@@ -1,52 +1,47 @@
 <?php
+if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) die();
+
 use Bitrix\Main\EventManager;
 use Bitrix\Main\EventResult;
 
+// добавляем обработчик
 EventManager::getInstance()->addEventHandler(
     'crm',
     'onEntityDetailsTabsInitialized',
-    'myOnEntityDetailsTabsInitialized'
+    'myOnEntityDetailsTabsInitialized_DealTabs' // Уникальное имя функции
 );
 
-function myOnEntityDetailsTabsInitialized($event)
+function myOnEntityDetailsTabsInitialized_DealTabs($event)
 {
     $tabs = $event->getParameter('tabs');
     $entityID = $event->getParameter('entityID');
     $entityTypeID = $event->getParameter('entityTypeID');
 
-    // Проверяем, что открыта карточка именно Сделки (Deal)
+    // Проверяем, что открыта карточка именно Сделки
     if ($entityTypeID == \CCrmOwnerType::Deal) {
         
         // Получаем HTML компонента
-        $content = getMyTabContent($entityID, $entityTypeID);
+        ob_start();
+        $GLOBALS['APPLICATION']->IncludeComponent(
+            'custom:dealtabs.grid',
+            '',
+            [
+                'ENTITY_ID' => $entityID,
+                'ENTITY_TYPE_ID' => $entityTypeID,
+            ],
+            false
+        );
+        $content = ob_get_clean();
 
-        // Добавляем вкладку с ключом 'html' (как в статье)
+        // Добавляем вкладку
         $tabs[] = [
             'id'   => 'tab_custom_dealtabs',
             'name' => 'Список товаров Автозаказ',
-            'html' => $content, // <--- ВАЖНО: ключ 'html', а не 'content'
+            'html' => $content,
         ];
     }
 
     return new EventResult(EventResult::SUCCESS, [
         'tabs' => $tabs,
     ]);
-}
-
-function getMyTabContent($entityID, $entityTypeID)
-{
-    global $APPLICATION;
-    ob_start();
-    
-    $APPLICATION->IncludeComponent(
-        'custom:dealtabs.grid',
-        '',
-        [
-            'ENTITY_ID' => $entityID,
-            'ENTITY_TYPE_ID' => $entityTypeID,
-        ],
-        false
-    );
-    
-    return ob_get_clean();
 }

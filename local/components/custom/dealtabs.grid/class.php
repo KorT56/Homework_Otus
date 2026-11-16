@@ -11,7 +11,7 @@ class CustomDealTabsGridComponent extends CBitrixComponent
         Loader::includeModule('catalog');
         Loader::includeModule('crm'); // Подключаем CRM для получения сделок
 
-        // --- 1. ПОЛУЧАЕМ ТОВАРЫ С ОСТАТКАМИ ---
+        // получаем товары с остатками
         $products = [];
         $partsIblockId = 14;
 
