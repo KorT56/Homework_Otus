@@ -1,29 +1,37 @@
 <?php
-
-// защита от неавторизованных
+// защита от гостей
 AddEventHandler("main", "OnProlog", "CloseAccessForUnauthorized");
 function CloseAccessForUnauthorized()
 {
+    // доступ к переменным
     global $USER, $APPLICATION;
+    // проверка админки
     if (defined('ADMIN_SECTION') && ADMIN_SECTION === true) {
         return;
     }
+    // проверка авторизации
     if (!$USER->IsAuthorized() && !in_array($APPLICATION->GetCurPage(), array("/auth/"))) {
+        // создаем ссылку
         $uri = new \Bitrix\Main\Web\Uri("/auth/");
+        // добавляем возврат
         $uri->addParams(["back_url" => $APPLICATION->GetCurPage()]);
+        // перенаправляем гостя
         LocalRedirect($uri->getUri());
+        // останавливаем скрипт
         die;
     }
 }
 
-// подключаю обработчик ошибок
+// подключаем обработчик ошибок
 $exceptionHandlerPath = $_SERVER['DOCUMENT_ROOT'] . '/local/App/Debug/ExceptionHandler.php';
+// проверяем файл
 if (file_exists($exceptionHandlerPath)) {
+    // грузим файл
     require_once $exceptionHandlerPath;
 }
 
-// автозагрузка для услуги автосервиса
-Bitrix\Main\Loader::registerAutoLoadClasses(
+// автозагрузка утилит
+\Bitrix\Main\Loader::registerAutoLoadClasses(
     null,
     ['Custom\\Uslugi\\ServiceTable' => '/local/modules/custom.uslugi/lib/ServiceTable.php']
 );
@@ -31,62 +39,37 @@ Bitrix\Main\Loader::registerAutoLoadClasses(
 // подключение модулей
 use Bitrix\Main\Loader;
 
-// модуль авто-заказа
+// модуль заказов автозаказ
 if (Loader::includeModule('custom.autoorder')) {
-    // настройки автозаказа
+    // настройки заказов
 }
 
-// модуль записи
+// модуль вкладок в сделках
+if (Loader::includeModule('custom.dealtabs')) {
+    // вкладки в crm
+}
+
+// модуль записи бронирование
 if (Loader::includeModule('custom.booking')) {
+    // грузим его скрипты
     \CJSCore::Init(['custom.booking']);
 }
 
-// ? получилось сделать пока только напрямую из init (подумаю еще) 
-use Bitrix\Main\EventManager;
+// подключаем перехватчик (ОТКЛЮЧЕНО ДЛЯ ОТЛАДКИ)
+// if (file_exists(__DIR__ . '/event_new.php')) {
+//     require_once __DIR__ . '/event_new.php';
+// }
 
-EventManager::getInstance()->addEventHandler(
-    'crm',
-    'onEntityDetailsTabsInitialized',
-    function (\Bitrix\Main\Event $event) {
-        if ($event->getParameter('entityTypeID') != \CCrmOwnerType::Deal) {
-            return;
-        }
-
-        $tabs = $event->getParameter('tabs');
-        $entityId = $event->getParameter('entityID');
-
-        // вкладка Список товаров Автозаказ
-        ob_start();
-        $GLOBALS['APPLICATION']->IncludeComponent(
-            'custom:dealtabs.grid', 
-            '', 
-            ['ENTITY_ID' => $entityId]
-        );
-        $html1 = ob_get_clean();
-
-        $tabs[] = [
-            'id' => 'tab_dealtabs',
-            'name' => 'Список товаров Автозаказ',
-            'html' => $html1,
-        ];
-
-        // вкладка Гараж
-        ob_start();
-        $GLOBALS['APPLICATION']->IncludeComponent(
-            'custom:garagtabs', 
-            '', 
-            ['ENTITY_ID' => $entityId]
-        );
-        $html2 = ob_get_clean();
-
-        $tabs[] = [
-            'id' => 'tab_garage',
-            'name' => 'Гараж',
-            'html' => $html2,
-        ];
-
-        return new \Bitrix\Main\EventResult(\Bitrix\Main\EventResult::SUCCESS, [
-            'tabs' => $tabs,
-        ]);
+// грузим  скрипт время
+\Bitrix\Main\EventManager::getInstance()->addEventHandler(
+    'main',
+    'OnProlog',
+    function () {
+        // получаем объект
+        $asset = \Bitrix\Main\Page\Asset::getInstance();
+        // подключаем js
+        $asset->addString('<script src="/local/additional/main.js?v=' . time() . '"></script>');
+        // подключаем css
+        $asset->addString('<link rel="stylesheet" href="/local/additional/main.css?v=' . time() . '">');
     }
 );
